@@ -1,20 +1,25 @@
 <!DOCTYPE html>
+<!--
+  Invoice Splitter · by Yogesh
+  Single-file app — host it anywhere as index.html (Netlify Drop, GitHub Pages, Cloudflare Pages).
+  Everything runs in the visitor's browser: no server, no uploads, no running costs.
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>*Auto Invoice Splitter*</title>
+<title>Invoice Splitter – Yogesh</title>
 
 <!-- share / search metadata -->
-<meta name="description" content="Free invoice PDF splitter — splits a combined multi-invoice PDF into separate files named by PO number, and extracts invoice №, PO № and grand total. Runs entirely in your browser; nothing is uploaded."/>
+<meta name="description" content="Free invoice PDF splitter — splits a combined multi-invoice PDF into separate files named by PO number, and extracts PO №, invoice № and grand total. Runs entirely in your browser; nothing is uploaded."/>
 <meta name="theme-color" content="#F3F1EB"/>
 <meta name="color-scheme" content="light"/>
 <meta property="og:title" content="Invoice Splitter – Yogesh"/>
-<meta property="og:description" content="Drop one combined invoice PDF, get one file per invoice named by its PO number — with invoice №, PO № and grand totals ready to copy. Free, private, 100% in your browser."/>
+<meta property="og:description" content="Drop one combined invoice PDF, get one file per invoice named by its PO number — with PO №, invoice № and grand totals ready to copy. Free, private, 100% in your browser."/>
 <meta property="og:type" content="website"/>
 <meta name="twitter:card" content="summary"/>
 <!-- once you know your live URL, uncomment and fill this in:
-<meta property="og:url" content="https://github.io/"/>
+<meta property="og:url" content="https://yourusername.github.io/invoice-splitter/"/>
 -->
 
 <!-- favicon: document with a red cut line, matches the app -->
@@ -107,18 +112,25 @@ main{display:grid;grid-template-columns:400px minmax(0,1fr);gap:16px;padding:16p
 .copyall.ok{border-color:var(--accent);color:var(--accent)}
 .details{flex:1;min-height:0;overflow-y:auto;padding:0 18px 14px;display:flex;flex-direction:column}
 .dempty{font-size:12px;color:var(--muted);line-height:1.7;padding:12px 2px}
-.dcols{display:grid;grid-template-columns:20px minmax(0,1fr) 72px 100px;gap:8px;padding:0 2px 6px;font:600 8.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;background:var(--card);z-index:2}
+.dcols{display:grid;grid-template-columns:20px minmax(0,1fr) minmax(0,1fr) 100px;gap:8px;padding:0 2px 6px;font:600 8.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;background:var(--card);z-index:2}
 .dcols .rt{text-align:right}
-.drow{display:grid;grid-template-columns:20px minmax(0,1fr) 72px 100px;gap:8px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--line);animation:rise .3s ease both}
+.drow{display:grid;grid-template-columns:20px minmax(0,1fr) minmax(0,1fr) 100px;gap:8px;align-items:center;padding:8px 2px;border-bottom:1px solid var(--line);animation:rise .3s ease both}
 .drow:last-child{border-bottom:none}
 .didx{font:500 10px var(--mono);color:var(--muted)}
 .dval{font:500 12px var(--mono);color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.dval.v-inv{font-weight:600}
-.dval.v-po{color:#4E4A42}
+.dval.v-po{font-weight:600}
+.dval.v-inv{color:#4E4A42}
 .dval.v-total{text-align:right;font-weight:600}
 .dval.miss{color:var(--muted);font-weight:400}
 
 /* ---------- 03 split ---------- */
+.namerow{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.namelbl{font:600 10px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.nameseg{margin-left:auto;display:flex;border:1px solid var(--line2);border-radius:8px;overflow:hidden}
+.nseg{font:600 11px var(--sans);padding:6px 12px;background:none;border:none;cursor:pointer;color:var(--muted);transition:all .15s;white-space:nowrap}
+.nseg + .nseg{border-left:1px solid var(--line2)}
+.nseg:hover{color:var(--ink)}
+.nseg.on{background:var(--ink);color:#fff}
 .btn-primary{width:100%;display:flex;align-items:center;justify-content:center;gap:9px;background:var(--ink);color:#fff;border:none;border-radius:11px;padding:15px 14px;font:600 13px var(--sans);letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .16s}
 .btn-primary .ic{width:15px;height:15px}
 .btn-primary:hover:not(:disabled){background:var(--accent)}
@@ -286,8 +298,15 @@ main{display:grid;grid-template-columns:400px minmax(0,1fr);gap:16px;padding:16p
     <section class="card" id="cardSplit">
       <div class="chead"><span class="cno">03</span><h2>Split &amp; save</h2></div>
       <div class="cbody">
+        <div class="namerow">
+          <span class="namelbl">PDF file name</span>
+          <div class="nameseg">
+            <button class="nseg on" type="button" data-tpl="{PO}.pdf">PO №</button>
+            <button class="nseg" type="button" data-tpl="{INV}.pdf">Invoice №</button>
+          </div>
+        </div>
         <button class="btn-primary" id="splitBtn" disabled><span class="bic" data-ic="scissors"></span><span id="splitLbl">Split &amp; Download — ZIP</span></button>
-        <p class="micro">Every invoice becomes its own PDF named by its <b>PO №</b>, bundled into one ZIP. All processing happens locally in this tab — nothing is uploaded.</p>
+        <p class="micro">Every invoice becomes its own PDF — named by the <b>PO №</b> or <b>invoice №</b> you pick above — bundled into one ZIP. All processing happens locally in this tab — nothing is uploaded.</p>
         <p class="credit">made by <b>Yogesh</b></p>
       </div>
     </section>
@@ -331,7 +350,7 @@ main{display:grid;grid-template-columns:400px minmax(0,1fr);gap:16px;padding:16p
           <text x="140" y="172">invoices</text>
         </svg>
         <h3>Blink it, Split it</h3>
-        <p>Drop a combined invoice PDF on the left. Pages are read right here in your browser — invoice numbers mark the cut points, and PO numbers name the files.</p>
+        <p>Drop a combined invoice PDF on the left. Pages are read right here in your browser — invoice numbers mark the cut points, and the picked number names the files.</p>
         <div class="steps3">
           <span><b>01</b>&nbsp; drop the pdf</span>
           <span><b>02</b>&nbsp; copy the numbers</span>
@@ -357,7 +376,7 @@ if (window.pdfjsLib){
 /* ================= built-in detection rules (no user editing needed) ================= */
 const INV_PATTERN = 'invoice\\s*(?:(?:no\\.?|number|num|nr)\\s*)?(?:[:#\\-]\\s*)?([A-Z0-9][A-Z0-9/\\-_]*\\d[A-Z0-9/\\-_]*)';
 const PO_PATTERN  = '(?:p\\.?\\s*o\\.?|purchase\\s*order)\\s*(?:(?:no\\.?|number|num)\\s*)?(?:[:#\\-]\\s*)?([A-Z0-9][A-Z0-9/\\-_]*\\d[A-Z0-9/\\-_]*)';
-const FILENAME_TPL = '{PO}.pdf';
+let filenameTpl = '{PO}.pdf';                 // switched by the PO № / Invoice № picker in section 03
 const CUR = '(?:[$€£₹¥]|rs\\.?|inr|usd|eur|gbp|chf|aed|sar|cad|aud)';
 /* grand-total candidates, in priority order — the last amount on the page wins */
 const TOTAL_STEPS = [
@@ -417,7 +436,8 @@ function extractValue(text, pattern){
   return String(v ?? m[0]).trim();
 }
 
-/* grand total: try labels in priority order; within a label the LAST amount found wins */
+/* grand total: try labels in priority order; within a label the LAST amount found wins.
+   the number is kept plain — no commas / spaces (e.g. 1418872.00) */
 function extractTotal(pageTexts, pages){
   for (const step of TOTAL_STEPS){
     let best = null;
@@ -428,7 +448,7 @@ function extractTotal(pageTexts, pages){
       let m;
       while ((m = re.exec(text)) !== null){
         const sym = (m[1] || '').replace(/\s+/g, ' ').trim();
-        const num = m[2].replace(/[\s\u00A0]/g, '');
+        const num = m[2].replace(/[\s\u00A0]/g, '').replace(/,/g, '');
         best = (sym ? sym + ' ' : '') + num;
       }
     }
@@ -473,9 +493,9 @@ function flashCheck(btn){
     btn.classList.remove('ok');
   }, 1400);
 }
-/* one line per invoice — tab-separated so it pastes into a spreadsheet cleanly */
+/* one line per invoice — PO first, then invoice №, then total (matches the details table) */
 function rowLine(row){
-  return [row.inv ?? '', row.po ?? '', row.total ?? ''].join('\t');
+  return [row.po ?? '', row.inv ?? '', row.total ?? ''].join('\t');
 }
 
 /* ================= reading a PDF (pdf.js) ================= */
@@ -510,7 +530,7 @@ async function analyzeFile(file){
         text = tc.items.map(t => t.str).join(' ').replace(/\s+/g, ' ').trim();
       } catch(e){ /* one unreadable page should not kill the run */ }
       file.pageTexts.push(text);
-      setProgress(`reading ${file.name} · page ${i}/${file.numPages}`, i / file.numPages);
+      setProgress(`reading ${file.name} · page ${i}/${doc.numPages}`, i / file.numPages);
       if (i % 4 === 0) await tick();
     }
     file.status = 'ready';
@@ -582,7 +602,7 @@ function recomputeNames(){
   for (const row of state.rows){
     const file = fileById(row.fileId);
     const base = file ? file.name.replace(/\.pdf$/i, '') : 'stack';
-    let name = FILENAME_TPL
+    let name = filenameTpl
       .replace(/\{PO\}/gi,    row.po  || 'NO_PO')
       .replace(/\{INV\}/gi,   row.inv || 'NO_INV')
       .replace(/\{file\}/gi,  base)
@@ -623,7 +643,7 @@ function renderDetails(){
     btn.disabled = true;
     let msg;
     if (!state.files.length){
-      msg = 'Invoice no., PO no. and grand total appear here after upload — grab them all with Copy all.';
+      msg = 'PO no., invoice no. and grand total appear here after upload — grab them all with Copy all.';
     } else if (state.files.some(f => f.status === 'ready')){
       msg = 'No invoices detected — the PDF may be scanned or use labels the built-in reader does not recognize.';
     } else {
@@ -634,12 +654,12 @@ function renderDetails(){
   }
   cnt.textContent = `${state.rows.length} invoice${state.rows.length === 1 ? '' : 's'}`;
   btn.disabled = false;
-  const head = `<div class="dcols"><span></span><span>invoice №</span><span>PO №</span><span class="rt">total</span></div>`;
+  const head = `<div class="dcols"><span></span><span>PO №</span><span>invoice №</span><span class="rt">grand total</span></div>`;
   const rows = state.rows.map((row, i) => `
     <div class="drow" data-drow="${row.id}">
       <span class="didx">${String(i + 1).padStart(2, '0')}</span>
-      ${dval(row.inv, 'v-inv')}
       ${dval(row.po, 'v-po')}
+      ${dval(row.inv, 'v-inv')}
       ${dval(row.total, 'v-total')}
     </div>`).join('');
   box.innerHTML = head + rows;
@@ -733,7 +753,7 @@ function updateSummary(){
   const vals = state.rows.map(r => parseTotal(r.total));
   if (vals.length && vals.every(v => v != null)){
     const sum = vals.reduce((a, b) => a + b, 0);
-    txt += ` · Σ ${sum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    txt += ` · Σ ${sum.toFixed(2)}`;       // plain number, no commas — consistent with the totals
   }
   el.textContent = txt;
 }
@@ -878,10 +898,19 @@ window.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer) i
 
  $('#splitBtn').addEventListener('click', runSplit);
 
-// the one copy action: every invoice's №, PO and total, as a spreadsheet-ready table
+// PDF name picker: PO № or Invoice № — file names in the manifest update instantly
+document.querySelectorAll('.nseg').forEach(b => b.addEventListener('click', () => {
+  if (filenameTpl === b.dataset.tpl) return;
+  filenameTpl = b.dataset.tpl;
+  document.querySelectorAll('.nseg').forEach(x => x.classList.toggle('on', x === b));
+  recomputeNames();
+  updateFnameCells();
+}));
+
+// the one copy action: PO №, invoice № and total per line, as a spreadsheet-ready table
  $('#copyAllBtn').addEventListener('click', async () => {
   if (!state.rows.length) return;
-  const lines = ['Invoice No\tPO No\tGrand Total'].concat(state.rows.map(rowLine));
+  const lines = ['PO No\tInvoice No\tGrand Total'].concat(state.rows.map(rowLine));
   const ok = await copyText(lines.join('\n'));
   if (ok){
     flashCheck($('#copyAllBtn'));
